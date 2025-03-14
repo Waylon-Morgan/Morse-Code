@@ -51,22 +51,26 @@
 </head>
 <body>
   <h1>Morse Code Player</h1>
+
+  <!-- Input for Text to Morse -->
   <label for="inputText">Enter Text:</label>
   <input type="text" id="inputText" placeholder="Enter text to convert to Morse code" />
-
-  <br><br>
-
-  <div class="slider-container">
-    <label for="speedSlider" class="slider-label">Playback Speed:</label>
-    <input type="range" id="speedSlider" min="50" max="1500" value="500" />
-    <span id="speedValue">500 ms</span>
-  </div>
-
   <br><br>
 
   <button onclick="playMorseCode()">Play Morse Code</button>
 
   <div id="morseOutput" class="output-container"></div>
+
+  <hr>
+
+  <!-- Input for Morse Code to Text -->
+  <label for="inputMorse">Enter Morse Code:</label>
+  <input type="text" id="inputMorse" placeholder="Enter Morse code to decode" />
+  <br><br>
+
+  <button onclick="decodeMorseCode()">Decode Morse Code</button>
+
+  <div id="decodedOutput" class="output-container"></div>
 
   <script>
     const morseCode = {
@@ -80,9 +84,16 @@
       " ": "/"
     };
 
+    const morseCodeReverse = Object.fromEntries(Object.entries(morseCode).map(([k, v]) => [v, k]));
+
     // Convert the input text into Morse code
     function textToMorse(text) {
       return text.toUpperCase().split('').map(char => morseCode[char] || '').join(' ');
+    }
+
+    // Decode Morse code to text
+    function morseToText(morse) {
+      return morse.split(' ').map(code => morseCodeReverse[code] || '').join('');
     }
 
     // Function to make a beep for dot or dash
@@ -101,47 +112,54 @@
       oscillator.stop(beep.currentTime + duration / 1000);
     }
 
-    // Function to play Morse code
+	// Function to play Morse code with explicit pauses
     function playMorseCode() {
       const text = document.getElementById("inputText").value;
       const morse = textToMorse(text);
       document.getElementById("morseOutput").innerText = morse;
 
-      const speed = document.getElementById("speedSlider").value;
-      const dotDuration = speed; // Dot duration in ms
-      const dashDuration = dotDuration * 3; // Dash duration is 3 times the dot duration
-      const symbolGap = dotDuration; // Small gap between symbols (dots and dashes)
-      const letterGap = dotDuration * 3; // Gap between letters
-      const wordGap = dotDuration * 7; // Gap between words
+      const dotDuration = 125;  // Dot duration = 0.25 seconds (250 ms)
+      const dashDuration = 250;  // Dash duration = 0.5 seconds (500 ms)
+      const symbolGap = 125;  // Space between symbols (dots/dashes) = 0.25 seconds (250 ms)
+      const letterGap = 500;  // Space between letters = 1 second (1000 ms)
+      const wordGap = 250 * 2;  // Space between words = 7 times the dot duration (7 seconds)
 
       let currentTime = 0;
+      let totalTime = 0;  // This will keep track of the total time passed
 
-      // Loop through each character in the Morse code
+      // Loop through each character in the Morse code and play sounds
       for (let i = 0; i < morse.length; i++) {
         const symbol = morse[i];
 
         if (symbol === '.') {
-          // Schedule a dot beep
-          setTimeout(() => beep(dotDuration), currentTime);
-          currentTime += dotDuration + symbolGap; // Increased gap after each dot
+          // Play dot beep
+          setTimeout(() => beep(dotDuration), totalTime);
+          totalTime += dotDuration + symbolGap; // After dot, add symbol gap
         } else if (symbol === '-') {
-          // Schedule a dash beep
-          setTimeout(() => beep(dashDuration), currentTime);
-          currentTime += dashDuration + symbolGap; // Increased gap after each dash
+          // Play dash beep
+          setTimeout(() => beep(dashDuration), totalTime);
+          totalTime += dashDuration + symbolGap; // After dash, add symbol gap
         } else if (symbol === ' ') {
-          // Space between letters (increased gap)
-          currentTime += letterGap;
+          // Space between letters (1 second)
+          totalTime += letterGap;
         } else if (symbol === '/') {
-          // Space between words (increased gap)
-          currentTime += wordGap;
+          // Space between words (7 seconds)
+          totalTime += wordGap;
+        }
+
+        // Add a gap between symbols (dots or dashes)
+        if (symbol === '.' || symbol === '-') {
+          totalTime += symbolGap;
         }
       }
     }
 
-    // Update the speed value label as slider is changed
-    document.getElementById("speedSlider").addEventListener("input", (event) => {
-      document.getElementById("speedValue").textContent = `${event.target.value} ms`;
-    });
+    // Decode Morse code to text when the button is clicked
+    function decodeMorseCode() {
+      const morseInput = document.getElementById("inputMorse").value.trim();
+      const decodedText = morseToText(morseInput);
+      document.getElementById("decodedOutput").innerText = decodedText;
+    }
   </script>
 </body>
 </html>

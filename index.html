@@ -118,11 +118,11 @@
       const morse = textToMorse(text);
       document.getElementById("morseOutput").innerText = morse;
 
-      const dotDuration = 125;  // Dot duration = 0.25 seconds (250 ms)
-      const dashDuration = 250;  // Dash duration = 0.5 seconds (500 ms)
-      const symbolGap = 125;  // Space between symbols (dots/dashes) = 0.25 seconds (250 ms)
-      const letterGap = 500;  // Space between letters = 1 second (1000 ms)
-      const wordGap = 250 * 2;  // Space between words = 7 times the dot duration (7 seconds)
+      const dotDuration = 75;  // Dot duration = 0.25 seconds (250 ms)
+      const dashDuration = 225;  // Dash duration = 0.5 seconds (500 ms)
+      const symbolGap = 75;  // Space between symbols (dots/dashes) = 0.25 seconds (250 ms)
+      const letterGap = 225;  // Space between letters = 1 second (1000 ms)
+      const wordGap = 525 * 1;  // Space between words = 7 times the dot duration (7 seconds)
 
       let currentTime = 0;
       let totalTime = 0;  // This will keep track of the total time passed
